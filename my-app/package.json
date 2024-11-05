@@ -1,0 +1,35 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.1.10",
+    "@next/font": "^14.2.15",
+    "customelement": "^1.1.1",
+    "lit-element": "^4.1.1",
+    "next": "14.2.15",
+    "next-google-fonts": "^2.2.0",
+    "property": "^3.0.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "url": "^0.11.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.15",
+    "eslint-plugin-tailwindcss": "^3.17.5",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}

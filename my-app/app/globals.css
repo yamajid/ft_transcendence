@@ -1,0 +1,72 @@
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+:root {
+  --background: #e40303;
+  --foreground: #000000;
+}
+
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+    --foreground: #f6f6f6;
+  }
+}
+
+.txt{
+  font-family: fantasy;
+}
+
+@keyframes paddel-1 {
+ 0% {
+  transform: translateY(-20%);
+  top: 50%;
+ }
+ 40% {
+  top: 30%;
+ }
+ 60%{
+  top: 60%
+ }
+ 80%{
+  top: 20%
+ }
+ 100% {
+  top: 30%;
+ }
+}
+
+
+@keyframes paddle-2 {
+ 0% {
+   transform: translateY(-100%);
+   top: 40%;
+}
+35% {
+  top: 65%;
+}
+50% {
+
+  top: 55%;
+}
+75% {
+  top: 60%;
+}
+100% {
+  top: 20%;
+ }
+}
+
+
+.animate-p1 {
+  animation: 2s linear 1s infinite alternate paddel-1;
+}
+.animate-p2 {
+  animation: 2s linear 1s infinite alternate paddle-2;
+}
