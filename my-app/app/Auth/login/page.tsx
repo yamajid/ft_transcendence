@@ -27,70 +27,61 @@ const schema = z.object({
     <>
     <form onSubmit={submit}>
 
-      <div className=" flex bg-[url('../components/background.jpg')] bg- bg-cover bg- bg-center bg-fixed justify-center items-center w-screen h-screen">
-          <div className=" border-double border-4 bg-black  m:w-[400px] m:h-[500px] bg-[url('../components/bg-card.jpg')] bg-cover bg-center bg-fixed  m:space-y-5  l:h-[600px] l:w-[470px] min-w-[280px] max-h-[1000px] h-96 w-44 rounded-lg flex-col aspect-[2/1]">
-                   <div>
-                   <div className="relative min-w-[200px] mt-6 w-32 m:w-64 m:h-32 l:w-[350px] l:h-[200px] border-y  aspect-[2/1] m-auto  border-black rounded-lg">
+      <div className=" flex justify-center bg-black items-center w-full h-screen">
+          <div className=" border-double border-4 bg-black  min-w-[280px] max-h-[1000px] h-96 w-44 m:w-[500px] m:h-[600px] rounded-lg flex-col  aspect-[2/1]">
+
+                   <div className="relative w-48 flex-col space-y-14 aspect-[2/1] m-auto m:m-24  border-black rounded-lg">
+
+
                           <div>
-                            <span className="absolute m:h-8 m:w-2  top-0 bg-white h-6 w-1 l:h-14 l:w-2 animate-p1"></span>
+                            <span className="absolute m:h-24 m:w-4 m:border-4 right-52 m:right-60  border-2 border-red-500 h-14 w-2  animate-p1"></span>
                           </div>
+
+
+
+
                           <div>
-                            <span className="absolute m:h-8 m:w-2 right-1 top-[8.7rem] bg-white h-6 w-1 l:h-14 l:w-2  animate-p2"></span>
+                            <span className="absolute m:h-24 m:w-4 m:border-4 left-52 m:left-80 border-2 border-blue-500 h-14  w-2 l:h-28 l:w-4  animate-p2"></span>
                           </div>
-                          <div>
-                            <span className="absolute top-12 left-24 m:ml-8 m:mt-4 l:size-4 l:mt-10 l:ml-20  m:size-3  rounded-full animate-bounce bg-white size-2"></span>
+
+
+                          <div className='h-36 flex-col space-y-20 m:space-y-32 m:w-72'>
+                                  <div>
+                                  <span className=' txt  flex justify-center animate-bounce  text-white text-2xl m:text-4xl  hover:text-red-600'>LOG - IN</span>
+                                  </div>
+                                <div className='flex-col space-y-4'>
+
+                                    <div>
+                                      <input type="email" name="email-input" className='border-2 border-black m:text-sm hover:border-red-500 h-8 w-full m:h-11  m:w-full p-2 text-xs rounded-s-md m:placeholder:text-sm placeholder:text-xs placeholder:p-1' placeholder='username'/>
+                                    </div>
+
+                                    <div>
+                                      <input type="password" name="password-input" className='border-2 border-black m:text-sm hover:border-red-500 h-8 w-full p-2 m:h-11 m:w-full text-xs rounded-s-md m:placeholder:text-sm placeholder:text-xs placeholder:p-1' placeholder='Password'/>
+                                    </div>
+                                    <div className='flex-col space-y-1 m:space-y-2'>
+
+                                            <div className='flex justify-center'>
+                                               <button type='submit' className='bg-blue text-white min-w-16 w-36 h-7 m:h-10 m:w-48 m:text-xl hover:border-2 hover:border-3  text-xs p-0.5  txt border rounded-s-md '>
+                                                  LOG - IN
+                                               </button>
+                                            </div>
+                                            <div className='flex justify-center'>
+                                               <button type='submit' className='bg-blue text-white min-w-16 w-36 h-7 m:h-10 m:w-48 m:text-xl hover:border-2 hover:border-3  text-xl p-0.5  txt border rounded-s-md '>
+                                                  42
+                                               </button>
+                                            </div>
+                                    </div>
+                                </div>
                           </div>
-                      </div>
                   </div>
-                  <div className='flex justify-center'>
-                  <div className='mt-7 m:flex-col m:space-y-3 l:flex-col l:space-y-3'>
-                  <div>
-                      <label htmlFor="email-input"  className='txt m:text-sm text-xs'>Email</label>
-                      <div>
-                      <input
-                          placeholder='enter your email'
-                          type='email'
-                          name='email-input'
-                          className='border p-2 text-xs l:h-9 max-w-6xl w-52 m:w-72 m:h-8 h-7 rounded-lg border-black'
-                          />
-                      </div>
-                </div>  
-                <div>
-                    <label htmlFor="password-input" className='txt m:text-sm text-xs'>Password</label>
-                    <div className="felx-col">
-                    <input
-                        placeholder='enter your password'
-                        type='password'
-                        name='password-input'
-                        className='border text-xs p-2 w-52 h-7 l:h-9 m:w-72 m:h-8 rounded-lg border-black'
-                        />
-                        </div>
-                </div>
-                <div className='flex justify-center mt-2'>
-                    <a className='text-xs txt m:text-sm' href='/Auth/register'> Create new account?</a>
-                  </div>
-                </div>
-                  </div>
-                  <div className='mt-3 flex justify-center'>
-                    <div className='flex-clo space-y-3  m:mt-4'>
-                      <div className='flex justify-center space-x-5 m:space-x-6'>
-                          <div>
-                                <button type='submit' className='bg-blue m:w-48 m:h-8 text-white min-w-16 w-28 m:text-base l:w-64 l:h-9 l:text-lg  hover:border-red-500 hover:border-3 text-xs p-0.5  txt border rounded-md' >
-                                  Sign In
-                                </button>
-                          </div>
-                          
-                    </div>
-                    <div className='flex justify-center'>
-                            <button className='bg-blue text-white m:w-48 m:h-8 min-w-16 w-28  m:text-base l:w-64 l:h-9  l:text-lg  hover:text-white hover:border-red-500 hover:border-3 text-xs p-0.5  txt border rounded-md' >
-                              Sign In With Intra
-                            </button>
-                    </div>
-                  </div>
-                </div>
+
           </div>
       </div>
       </form>
     </>
   );
 }
+
+                            // <div className='flex-col space-y-3'>
+
+                            // </div>
