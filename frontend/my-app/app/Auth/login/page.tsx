@@ -28,7 +28,7 @@ export default function Home() {
       
         try {
           await schema.parseAsync({email,password});
-          const response = await AxiosInstance.post('login/', {email, password})
+          const response = await AxiosInstance.post('/api/login/', {email, password})
           if (response.status == 200){
               const {access, refresh} = response.data;
              console.log('Login successful:', access, refresh);
