@@ -26,9 +26,8 @@ export default function Home() {
     try {
       await schema.parseAsync({email,password, username});
       const response = await AxiosInstance.post('/api/register/', {username, email, password})
-      console.log('Form submitted successfully:', email, password, username)
         if (response.status == 201){
-          console.log('Form submitted successfully:', formData);
+          console.log('Form submitted successfully:');
         }
     } catch (err) {
         console.log('Validation failed:', err);

@@ -81,7 +81,7 @@ export default function Home() {
                                                </button>
                                             </div>
                                             <div className='flex justify-center'>
-                                               <button type='submit' className='bg-blue text-white min-w-16 w-36 h-7 m:h-10 m:w-48 m:text-xl hover:border-2 hover:border-3  text-xl p-0.5  txt border rounded-s-md '>
+                                               <button onClick={() => window.location.href='https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3ac2cf4d9b15db06f9de8f46771e3cf54b5e92d8432a11d5df97d4172e4566b5&redirect_uri=http%3A%2F%2F127.0.0.1%3A3000&response_type=code'} type='submit' className='bg-blue text-white min-w-16 w-36 h-7 m:h-10 m:w-48 m:text-xl hover:border-2 hover:border-3  text-xl p-0.5  txt border rounded-s-md '>
                                                   42
                                                </button>
                                             </div>

@@ -4,27 +4,50 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import UserSerializer
-from rest_framework_simplejwt.views import  TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainSlidingView
+from rest_framework_simplejwt.tokens import SlidingToken
+
+from rest_framework import permissions
 
 class UserRegistration(APIView):
-    permission_classes = []
-    authentication_classes = []
     def post(self, request, *args, **kwargs):
         serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "User is created success"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": "User is created success"}, status=status.HTTP_201_CREATED)
     
-class UserLogin(TokenObtainPairView):
-    permission_classes = []
-    authentication_classes = []
+class UserLogin(TokenObtainSlidingView): # here we use just one token (learn about sliding token)
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         if response.status_code == status.HTTP_200_OK:
-            access_token = response.data.get('access')
-            refresh_token = response.data.get('refresh')
-            response.set_cookie('access_token', access_token, httponly=True, max_age=250000, expires=250000, secure=True, samesite='None')
-            response.set_cookie('refresh_token', refresh_token, httponly=True, max_age=250000, expires=250000, secure=True ,samesite='None')
-            # response.set_cookie('logged_in', 'true', httponly=False, max_age=250000, expires=250000, secure=False ,samesite='Strict')
+            token = response.data.pop('token')
+            response.data = {'message':'loged in successfully'}
+            response.set_cookie(
+                key='token',
+                value=token,
+                httponly=True,
+            )
         return response
+
+
+class UserAuthorization(APIView):
+    pass
+
+
+class   TestAuthView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request):
+        return Response({
+            'message': 'it works'
+        })
+
+class   LogOutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request):
+        res = Response({'message': 'you logged out successfully'})
+        token = SlidingToken(request.COOKIES['token'])
+        token.blacklist()
+        return res
+            
