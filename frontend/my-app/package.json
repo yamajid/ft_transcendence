@@ -14,7 +14,7 @@
     "axios": "^1.7.7",
     "customelement": "^1.1.1",
     "lit-element": "^4.1.1",
-    "next": "14.2.15",
+    "next": "^15.0.3",
     "next-google-fonts": "^2.2.0",
     "property": "^3.0.0",
     "react": "^18",

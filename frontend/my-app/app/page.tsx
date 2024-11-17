@@ -1,10 +1,35 @@
 "use client"
 
 import  Link  from 'next/link'
-
+import { useEffect } from 'react'
+import AxiosInsitance from '../components/axios'
 
 
 export default function Home() {
+  
+  useEffect(() => {
+    const handdelCallBack = async () =>{
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      try{
+        const respons = await AxiosInsitance.post('/api/callback/' ,{code});
+        if (respons.status == 200)
+          if (code){
+            console.log("oauth seccuss");
+              return 0;
+              
+        }
+
+      }
+      catch(error){
+        console.log("errors from axios call pack ", error)
+      }
+    }
+    handdelCallBack();    
+    
+  }, []);
+  
   return(
     <>
       <div className="flex  bg-black justify-center items-center w-screen h-screen">
@@ -49,10 +74,3 @@ export default function Home() {
     </>
   );
 }
-
-
-// <Link href=''>
-//     <button className='bg-blue text-white m:w-48 m:h-8 min-w-16 w-36  m:text-base l:w-64 l:h-9  l:text-lg  hover:text-white hover:border-red-500 hover:border-3 text-xs p-0.5  txt border rounded-md' >
-//       Sign In With Intra
-//     </button>
-// </Link>

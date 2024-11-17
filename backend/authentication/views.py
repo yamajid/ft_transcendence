@@ -3,44 +3,53 @@ from urllib import response
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserSerializer
+from rest_framework.generics import CreateAPIView
+from .serializers import UserSerializer, OauthSerializer
 from rest_framework_simplejwt.views import TokenObtainSlidingView
 from rest_framework_simplejwt.tokens import SlidingToken
+import requests
+from django.conf import settings
 
 from rest_framework import permissions
 
 class UserRegistration(APIView):
-    def post(self, request, *args, **kwargs):
-        serializer = UserSerializer(data=request.data)
+    userSerializer = UserSerializer
+    def post(self, request):
+        serializer = self.userSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": "User is created success"}, status=status.HTTP_201_CREATED)
     
 class UserLogin(TokenObtainSlidingView): # here we use just one token (learn about sliding token)
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
+    def post(self, request):
+        response = super().post(request)
         if response.status_code == status.HTTP_200_OK:
             token = response.data.pop('token')
-            response.data = {'message':'loged in successfully'}
             response.set_cookie(
                 key='token',
                 value=token,
                 httponly=True,
             )
+            response.data = {'message':'loged in successfully'}
         return response
 
 
-class UserAuthorization(APIView):
-    pass
 
-
-class   TestAuthView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+class UserAuthorization(TokenObtainSlidingView):
+    serializer_class = OauthSerializer
     
-    def get(self, request):
-        return Response({
-            'message': 'it works'
-        })
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        response = Response({'message':'loged in successfully'})
+        response.set_cookie(
+            key='token',
+            value=serializer.data['token'],
+            httponly=True,
+        )
+        return response
+
 
 class   LogOutView(APIView):
     permission_classes = [permissions.IsAuthenticated]

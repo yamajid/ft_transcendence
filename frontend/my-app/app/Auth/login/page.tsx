@@ -1,11 +1,6 @@
 "use client"
 
 import { z } from 'zod'
-
-// import { useRouter } from 'next/navigation';
-
-// import { useState } from 'react'
-
 import AxiosInstance from '../../../components/axios' 
 
 const schema = z.object({
@@ -15,10 +10,6 @@ const schema = z.object({
   
 
 export default function Home() {
-  // const router = useRouter();
-
-      // const [errormsg, setErrormsg] = useState('');
-      // const [sucessmsg, setsucessmsg] = useState('');
       const submit = async (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
       
@@ -32,7 +23,6 @@ export default function Home() {
           if (response.status == 200){
               const {access, refresh} = response.data;
              console.log('Login successful:', access, refresh);
-            //  router.push("/");
           }
         } catch (err) {
           console.log('Validation failed:', err);
@@ -96,7 +86,3 @@ export default function Home() {
     </>
   );
 }
-
-                            // <div className='flex-col space-y-3'>
-
-                            // </div>
