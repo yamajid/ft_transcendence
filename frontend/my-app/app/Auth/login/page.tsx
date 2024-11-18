@@ -8,7 +8,6 @@ const schema = z.object({
   password: z.string().min(7).nonempty(),
 })
   
-
 export default function Home() {
       const submit = async (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
