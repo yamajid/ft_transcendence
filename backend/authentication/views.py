@@ -42,12 +42,12 @@ class UserAuthorization(TokenObtainSlidingView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        response = Response({'message':'loged in successfully'})
         response.set_cookie(
             key='token',
             value=serializer.data['token'],
             httponly=True,
         )
-        response = Response({'message':'loged in successfully'})
         return response
 
 
