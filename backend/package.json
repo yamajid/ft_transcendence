@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "request": "^2.88.2",
-    "update": "^0.7.4"
-  }
-}
