@@ -17,7 +17,8 @@ class GameClient(AsyncWebsocketConsumer):
     
     connected_sockets = []
     active_matches = []
-    num = 1 
+    num = 1
+    y = 100
     async def connect(self):
         self.player = {}
         await self.accept()
@@ -49,7 +50,7 @@ class GameClient(AsyncWebsocketConsumer):
                     'paddlesW': 10, 
                     'paddlesH': 100,
                     'paddlesX': 5,
-                    'paddlesY': 200,
+                    'paddlesY': GameClient.y,
                     'paddlesB': 10,
                     'game_group': self.group_name
                 })
@@ -62,20 +63,39 @@ class GameClient(AsyncWebsocketConsumer):
             data = json.loads(text_data)
         except Exception as e:
             print("error :", e)
-        # if data['type'] == 'paddleMove':
-        #     if data['playerNumber'] == '1':
-        #         group_name = data.gameGroup
-        #         await self.channel_layer.group_send(
-        #             group_name,
-        #             {
-        #                 'type': 'paddleMoved',
-        #                 'paddlew': data['paddlew'],
-        #                 'paddleh': data['paddleh'],
-        #                 'paddlex': data['paddlex'],
-        #                 'paddley': data['paddley'],
-        #                 'playerN': data['playerNumber']
-        #             }
-                # )
+        if data['type'] == 'paddleMove':
+            if data['playerNumber'] == '1':
+                print(data, flush=True)
+                if data['direction'] == 'up':
+                    GameClient.y -= 30
+                else:
+                    GameClient.y += 30
+
+                group_name = data['gameGroup']
+                await self.channel_layer.group_send(
+                    group_name,
+                    {
+                        'type': 'paddleMoved',
+                        'playerNumber': data['playerNumber'],
+                        'updateY': GameClient.y
+                    }
+                )
+            elif data['playerNumber'] == '2':
+                if data['direction'] == 'up':
+                    GameClient.y -= 30
+                else:
+                    GameClient.y += 30
+
+                group_name = data['gameGroup']
+                await self.channel_layer.group_send(
+                    group_name,
+                    {
+                        'type': 'paddleMoved',
+                        'playerNumber': data['playerNumber'],
+                        'updateY': GameClient.y
+                    }
+                )
+                
     
             
     # async def disconnect(self, close_data):
@@ -91,16 +111,12 @@ class GameClient(AsyncWebsocketConsumer):
     #         }
     #     )
         
-    # async def paddleMoved(self, event):
-    #     await self.send(json.dumps({
-    #         'type': event['type'],
-    #         'paddlesW': event['paddlew'],
-    #         'paddlesH': event['paddleh'],
-    #         'paddlesX': event['paddlex'],
-    #         'paddlesY': event['paddley'],
-    #         'playerN': event['playerN']
-            
-    #     }))
+    async def paddleMoved(self, event):
+        await self.send(json.dumps({
+            'type': event['type'],
+            'playerNumber': event['playerNumber'],
+            'updateY': event['updateY']
+        }))
     
     
     async def game_started(self, event):
@@ -109,7 +125,7 @@ class GameClient(AsyncWebsocketConsumer):
             'paddlesW': 10,
             'paddlesH': 100,
             'paddlesX': 5,
-            'paddlesY': 200,
+            'paddlesY': event['paddlesY'],
             'paddlesB': 10,
             'game_group': event['game_group']
             

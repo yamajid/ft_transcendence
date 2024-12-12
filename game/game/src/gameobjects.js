@@ -6,7 +6,7 @@
 /*   By: yamajid <yamajid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 22:25:20 by momihamm          #+#    #+#             */
-/*   Updated: 2024/12/09 20:55:59 by yamajid          ###   ########.fr       */
+/*   Updated: 2024/12/11 22:07:43 by yamajid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ export class Ball {
     p5.fill(255);
     p5.ellipse(this.x, this.y, this.radius * 2);
   }
-
+  
   move(p5, leftPaddle, rightPaddle) {
     this.x += this.speedX;
     this.y += this.speedY;
@@ -55,33 +55,15 @@ export class Ball {
       this.speedY *= -1;
     }
   
-    // Bounce off paddles
-    // Left paddle
-    if (
-      this.x - this.radius <= leftPaddle.x + leftPaddle.width && // Left paddle
-      this.y >= leftPaddle.y &&
-      this.y <= leftPaddle.y + leftPaddle.height
-    ) {
-      let pointOfColl, dirction;
-      pointOfColl = this.y - (leftPaddle.y + (leftPaddle.height / 2));
-      pointOfColl /= (leftPaddle.height / 2);
-      this.angle = pointOfColl * (Math.PI / 4);
-      if (this.x > (this.canvasW /2)){
-        dirction = -1;
-      }
-      else
-        dirction = 1;
-      this.speedX = dirction * this.constSpeed * Math.cos(this.angle);
-      this.speedY =  Math.sin(this.angle) * this.constSpeed;
-    } 
-    
-
+    // Boww
     // Right paddle
     else if (
       this.x + this.radius >= rightPaddle.x && // Right paddle
       this.y >= rightPaddle.y &&
       this.y <= rightPaddle.y + rightPaddle.height
-    ) {
+    )
+    
+    {
       let pointOfColl, dirction;
       pointOfColl = this.y - (rightPaddle.y + (rightPaddle.height / 2));
       pointOfColl /= (rightPaddle.height / 2);
@@ -103,6 +85,7 @@ export class Ball {
       this.reset(p5);
     }
   }
+
   
   reset(p5) {
     this.x = p5.width / 2;

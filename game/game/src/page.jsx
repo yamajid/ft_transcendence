@@ -6,7 +6,7 @@
 /*   By: yamajid <yamajid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 12:41:28 by momihamm          #+#    #+#             */
-/*   Updated: 2024/12/11 15:47:31 by yamajid          ###   ########.fr       */
+/*   Updated: 2024/12/12 00:21:31 by yamajid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,14 @@ import useWebSocket from 'react-use-websocket';
 function Back() {
   return <div className="background"></div>;
 }
-let y = 0
+let yL = 0
+let yR = 0
 let x = 0
 let height = 0
 let width = 0
 let bord = 0
+let flag = false
+let groupname = ''
 
 function App() {
   const [gameUrl] = useState('ws://127.0.0.1:8000/ws/ping_pong');
@@ -44,18 +47,28 @@ function App() {
                 setPlayerName(data['information']['player_name'])
             }
             if (data['type'] === 'game_started')
-              console.log(data['matchNum'])
-              width = data['paddlesW']    
-              height = data['paddlesH']    
-              x = data['paddlesX']    
-              y = data['paddlesY']       
-              bord = data['paddlesB']   
-               
-              setGame(data['game_group'])
-              console.log(data)
-              if (data['type'] === 'paddleMoved'){
+              {
+                console.log(data['matchNum'])
+                width = data['paddlesW']    
+                height = data['paddlesH']    
+                x = data['paddlesX']    
+                yL = data['paddlesY']       
+                yR = data['paddlesY']       
+                bord = data['paddlesB']
+                flag = true
+                setGame(data['game_group'])
+                
               }
+              console.log(data)
+            if (data['type'] === "paddleMoved"){
+                console.log(data);
+                if (data['playerNumber'] === '1')
+                    yL = data.updateY;
+                else
+                    yR = data.updateY
             }
+            }
+              
           }
         }, [lastMessage])
   const Canvas = () => {
@@ -96,56 +109,77 @@ function App() {
         // console.log(playerName)
         // console.log(gameG)
         leftPaddle.y = Math.max(0, leftPaddle.y - leftPaddle.speed); // Prevent moving out of bounds
-        // sendMessage(JSON.stringify({
-        //   'type' : 'paddleMove',
-        //   'playerNumber': playerNumber,
-        //   'playerName': playerName,
-        //   'paddlew': leftPaddle.width,
-        //   'paddleh': leftPaddle.height,
-        //   'paddlex': leftPaddle.x,
-        //   'paddley': leftPaddle.y,
-        //   'gameGroup': gameG
-        // }))
+        sendMessage(JSON.stringify({
+          'type' : 'paddleMove',
+          'direction': 'up',
+          'playerNumber': playerNumber,
+          'playerName': playerName,
+          'paddley': leftPaddle.y,
+          'gameGroup': gameG
+        }))
       }
       if (p5.keyIsDown(83)) { // 'S' key
         leftPaddle.y = Math.min(p5.height - leftPaddle.height, leftPaddle.y + leftPaddle.speed);
+        sendMessage(JSON.stringify({
+          'type' : 'paddleMove',
+          'direction': 'down',
+          'playerNumber': playerNumber,
+          'playerName': playerName,
+          'paddley': leftPaddle.y,
+          'gameGroup': gameG
+        }))
       }
       
       // Move right paddle with UP and DOWN arrow keys
       if (p5.keyIsDown(p5.UP_ARROW)) {
-        rightPaddle.y = Math.max(0, rightPaddle.y - rightPaddle.speed); // Prevent moving out of bounds
+        rightPaddle.y = Math.max(0, rightPaddle.y - rightPaddle.speed);
+        sendMessage(JSON.stringify({
+          'type' : 'paddleMove',
+          'direction': 'up',
+          'playerNumber': playerNumber,
+          'playerName': playerName,
+          'paddley': leftPaddle.y,
+          'gameGroup': gameG
+        }))// Prevent moving out of bounds
       }
       if (p5.keyIsDown(p5.DOWN_ARROW)) {
         rightPaddle.y = Math.min(p5.height - rightPaddle.height, rightPaddle.y + rightPaddle.speed);
+        sendMessage(JSON.stringify({
+          'type' : 'paddleMove',
+          'direction': 'down',
+          'playerNumber': playerNumber,
+          'playerName': playerName,
+          'paddley': leftPaddle.y,
+          'gameGroup': gameG
+        }))
       }
     };
     
     const draw = (p5) => {
       const centerX = p5.width / 2; // Center of the canvas
       const dashHeight = 2;        // Height of each dash
-      const gapHeight = 5;         // Gap between dashes
+      const gapHeight = 5;
+      const heightT = p5.height;        // Gap between dashes
       
       p5.background('#000000');
       p5.stroke(255);               // Set line color to white
       p5.strokeWeight(2);           // Set line thickness
       // Loop to draw dashes
-      for (let y = 0; y < p5.height; y += dashHeight + gapHeight) {
-        p5.line(centerX, y, centerX, y + dashHeight); // Draw each dash
-      }
+      p5.line(centerX, 0, centerX, heightT); // Draw each dash
       // Set up text properties
       p5.fill(255); // White color for the text
       p5.noStroke(); // No border around the text
       p5.textSize(p5.width * 0.1); // Text size relative to canvas width
       p5.textAlign(p5.CENTER, p5.CENTER); // Center align text
       handlePaddleMovement(p5);
-      leftPaddle.show(p5);
-      rightPaddle.show(p5, x, y, width, height, bord);
+      leftPaddle.show(p5,p5.width * 0.97, yL, width, height, bord);
+      rightPaddle.show(p5,p5.width * 0.01, yR, width, height, bord);
       
       ball.move(p5, leftPaddle, rightPaddle);
       // console.log(ball)
       p5.text(leftPaddle.score, p5.width * 0.25, p5.height * 0.2); // Left score at 25% width
           p5.text(rightPaddle.score, p5.width * 0.75, p5.height * 0.2); // Right score at 75% width
-          ball.show(p5, );
+          ball.show(p5);
         };
         
         const windowResized = (p5) => {
