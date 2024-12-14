@@ -6,7 +6,7 @@
 /*   By: yamajid <yamajid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 12:41:28 by momihamm          #+#    #+#             */
-/*   Updated: 2024/12/14 20:33:21 by yamajid          ###   ########.fr       */
+/*   Updated: 2024/12/15 00:22:57 by yamajid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ let xR = 0
 let xL = 0
 let paddleHeight = 0
 let paddleWidth = 0
+let paddleSpeed = 0
 let bord = 0
 let canvasH = 0
 let canvasW = 0
@@ -37,6 +38,8 @@ let speedY =  0
 let constSpeed = 0
 let angle = 0
 let score = 0
+let leftPaddle = '' 
+let rightPaddle = ''
 
 function App() {
   const [gameUrl] = useState('ws://127.0.0.1:8000/ws/ping_pong');
@@ -57,41 +60,29 @@ function App() {
             }
             if (data['type'] === 'game_started')
               {
-                // console.log(data.player)
-                canvasH = data.paddle.canvasHeight
-                canvasW = data.paddle.canvasWidth
-                paddleWidth = data.paddle.width  
-                paddleHeight = data.paddle.height
+                canvasH = data.paddleLeft.canvasHeight
+                canvasW = data.paddleRight.canvasWidth
                 if (data.player.player_number === '1'){
-                    xL = data.paddle.x
-                    yL = data.paddle. y    
+                    rightPaddle = data.paddleRight;
+                    leftPaddle = data.paddleLeft;
                   }
                   else{
-                    xR = data.paddle.x   
-                    yR = data.paddle.y      
+                    leftPaddle = data.paddleLeft;
+                    rightPaddle = data.paddleRight;    
                 }
-                // bord = data.paddle.
-                bord = data.paddle.border
-                score = data.paddle.score
+                // console.log(rightPaddle)
                 setGame(data.game_group)
-                // // ball
-                // ballX = data['ballX']
-                // ballY = data['ballY']
-                // radius = data['radius']
-                // speedX = data['speedX']
-                // speedY = data['speedY']
-                // constSpeed = data['constSpeed']
-                // angle = data['angle']
                 
               }
-              // console.log(data)
-            // if (data['type'] === "paddleMoved"){
-            //     // console.log(data);
-            //     if (data['playerNumber'] === '1')
-            //         yL = data.updateY;
-            //     else
-            //         yR = data.updateY;
-            // }
+            if (data['type'] === "paddleMoved"){
+                // console.log(data);
+                if (data['playerNumber'] === '1'){
+                  rightPaddle = data.updateY;
+                }
+                else{
+                  leftPaddle = data.updateY;
+                }
+            }
             // if (data['type'] === "ball_update"){
             //   console.log(data);
             // }
@@ -100,7 +91,7 @@ function App() {
           }
         }, [lastMessage])
   const Canvas = () => {
-    let ball, leftPaddle, rightPaddle;
+    let ball;
     // let paddleWidth = width;//= p5.width * 0.02; // 2% of canvas width
     // let paddleHeight = height;// = p5.height * 0.2; // 20% of canvas height
     // let ballRadius = 0;// p5.width * 0.02; // 2% of canvas width
@@ -111,11 +102,6 @@ function App() {
       const canvasWidth = canvasW; // 80% of window width
       const canvasHeight = canvasH; // 80% of window height
       const canvas = p5.createCanvas(canvasWidth, canvasHeight).parent(canvasParentRef);
-      let initScore = 0;
-      let ballSpeed = 10 ;
-      paddleWidth = canvasWidth * 0.01; // 2% of canvas width
-      paddleHeight = canvasHeight * 0.2; // 20% of canvas height
-      // ballRadius = canvasWidth * 0.02; // 2% of canvas width
   
       // Position the canvas
       canvas.style('position', 'absolute'); // Use absolute positioning
@@ -123,9 +109,9 @@ function App() {
       canvas.style('left', '10%');         // Move 10% to the right
       canvas.style('border-radius', '15px');
       canvas.style('border', '2px dashed white');
-      leftPaddle = new Paddle(xL , yL, paddleWidth, paddleHeight, 10, 10, initScore);
+      leftPaddle = new Paddle(leftPaddle.x , leftPaddle.y, leftPaddle.width, leftPaddle.height, leftPaddle.speed,10, leftPaddle.score);
       // console.log(yR)
-      rightPaddle = new Paddle(xR - paddleWidth, yR, paddleWidth, paddleHeight, 10, 10, initScore);
+      rightPaddle = new Paddle(rightPaddle.x , rightPaddle.y, rightPaddle.width, rightPaddle.height, rightPaddle.speed, 10, rightPaddle.score);
       ball = new Ball(ballX, ballY, radius, speedX, speedY, angle, canvasWidth, speedY);
       p5.frameRate(60);
     };
@@ -137,63 +123,36 @@ function App() {
         // console.log(playerNumber)
         // console.log(playerName)
         // console.log(gameG)
-        leftPaddle.y = Math.max(0, leftPaddle.y - leftPaddle.speed); // Prevent moving out of bounds
+        // leftPaddle.y = Math.max(0, leftPaddle.y - leftPaddle.speed); // Prevent moving out of bounds
         // console.log(leftPaddle.y)
         sendMessage(JSON.stringify({
           'type' : 'paddleMove',
           'direction': 'up',
           'playerNumber': playerNumber,
           'playerName': playerName,
-          'paddley': leftPaddle.y,
-          'paddlex': leftPaddle.x,
+          // 'paddley': leftPaddle.y,
+          // 'paddlex': leftPaddle.x,
           'gameGroup': gameG
         }))
       }
       if (p5.keyIsDown(83) || p5.keyIsDown(p5.DOWN_ARROW)) { // 'S' key
-        leftPaddle.y = Math.min(p5.height - leftPaddle.height, leftPaddle.y + leftPaddle.speed);
+        // leftPaddle.y = Math.min(p5.height - leftPaddle.height, leftPaddle.y + leftPaddle.speed);
         sendMessage(JSON.stringify({
           'type' : 'paddleMove',
           'direction': 'down',
           'playerNumber': playerNumber,
           'playerName': playerName,
-          'paddley': leftPaddle.y,
-          'paddlex': leftPaddle.x,
+          // 'paddley': leftPaddle.y,
+          // 'paddlex': leftPaddle.x,
           'gameGroup': gameG
         }))
       }
       
-      // Move right paddle with UP and DOWN arrow keys
-      // if (p5.keyIsDown(87) || p5.keyIsDown(p5.UP_ARROW)) {
-      //   rightPaddle.y = Math.max(0, rightPaddle.y - rightPaddle.speed);
-      //   sendMessage(JSON.stringify({
-      //     'type' : 'paddleMove',
-      //     'direction': 'up',
-      //     'playerNumber': playerNumber,
-      //     'playerName': playerName,
-      //     'paddley': rightPaddle.y,
-      //     'paddlex': rightPaddle.x,
-      //     'gameGroup': gameG
-      //   }))// Prevent moving out of bounds
-      // }
-      // if (p5.keyIsDown(83) || p5.keyIsDown(p5.DOWN_ARROW)) {
-      //   rightPaddle.y = Math.min(p5.height - rightPaddle.height, rightPaddle.y + rightPaddle.speed);
-      //   sendMessage(JSON.stringify({
-      //     'type' : 'paddleMove',
-      //     'direction': 'down',
-      //     'playerNumber': playerNumber,
-      //     'playerName': playerName,
-      //     'paddley': rightPaddle.y,
-      //     'paddlex': rightPaddle.x,
-      //     'gameGroup': gameG
-      //   }))
-      // }
     };
     
     const draw = (p5) => {
-      const centerX = p5.width / 2; // Center of the canvas
-      const dashHeight = 2;        // Height of each dash
-      const gapHeight = 5;
-      const heightT = p5.height;        // Gap between dashes
+      const centerX = canvasW / 2; // Center of the canvas
+      const heightT = canvasH;        // Gap between dashes
       
       p5.background('#000000');
       p5.stroke(255);               // Set line color to white
@@ -203,11 +162,11 @@ function App() {
       // Set up text properties
       p5.fill(255); // White color for the text
       p5.noStroke(); // No border around the text
-      p5.textSize(p5.width * 0.1); // Text size relative to canvas width
+      p5.textSize(canvasW * 0.1); // Text size relative to canvas width
       p5.textAlign(p5.CENTER, p5.CENTER); // Center align text
       handlePaddleMovement(p5);
-      leftPaddle.show(p5, xL, yL, paddleWidth, paddleHeight, bord);
-      rightPaddle.show(p5, xR, yR, paddleWidth, paddleHeight, bord);
+      leftPaddle.show(p5, leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height, leftPaddle.bord);
+      rightPaddle.show(p5, rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height, rightPaddle.bord);
       
       // ball.move(p5, leftPaddle, rightPaddle);
       // console.log(ball)

@@ -112,6 +112,29 @@ class GameClient(AsyncWebsocketConsumer):
     paddlesB = 10
     paddlesSpeed = 10
     paddlesScore = 10
+    paddleRight = Paddle(
+        paddleWidth=paddlesW,
+        paddleHeight=paddlesH,
+        paddleY=paddlesYR,
+        paddleX=paddlesXR,
+        paddleSpeed=paddlesSpeed,
+        paddleBord=paddlesB,
+        paddleScore=paddlesScore,
+        canvasHeight=canvasHeight,
+        canvasWidth=canvasWidth
+    )
+    
+    paddleLeft = Paddle(
+        paddleWidth=paddlesW,
+        paddleHeight=paddlesH,
+        paddleY=paddlesYL,
+        paddleX=paddlesXL,
+        paddleSpeed=paddlesSpeed,
+        paddleBord=paddlesB,
+        paddleScore=paddlesScore,
+        canvasHeight=canvasHeight,
+        canvasWidth=canvasWidth
+    )
     
     async def connect(self):
         self.player = {}
@@ -139,59 +162,24 @@ class GameClient(AsyncWebsocketConsumer):
             await self.channel_layer.group_add(self.new_match.group_name, player2['player_name'])
             self.active_matches.append(self.new_match)
             print(self.new_match.group_name)
-            self.paddleRight = Paddle(
-                paddleWidth=self.paddlesW,
-                paddleHeight=self.paddlesH,
-                paddleY=self.paddlesYR,
-                paddleX=self.paddlesXR,
-                paddleSpeed=self.paddlesSpeed,
-                paddleBord=self.paddlesB,
-                paddleScore=self.paddlesScore,
-                canvasHeight=self.canvasHeight,
-                canvasWidth=self.canvasWidth
-            )
-            
-            self.paddleLeft = Paddle(
-                paddleWidth=self.paddlesW,
-                paddleHeight=self.paddlesH,
-                paddleY=self.paddlesYL,
-                paddleX=self.paddlesXL,
-                paddleSpeed=self.paddlesSpeed,
-                paddleBord=self.paddlesB,
-                paddleScore=self.paddlesScore,
-                canvasHeight=self.canvasHeight,
-                canvasWidth=self.canvasWidth
-            )
             await self.channel_layer.send(player1['player_name'], # data{ type:"move", playerNumber: "1", groupName: "self.group_name" }
                 {
                     'type': 'game_started',
                     'game_group': self.new_match.group_name,
                     'player': player1,
-                    'paddle': self.paddleRight.to_dict()
+                    'paddleRight': self.paddleRight.to_dict(),
+                    'paddleLeft': self.paddleLeft.to_dict()
                 })
             await self.channel_layer.send(player2['player_name'], # data{ type:"move", playerNumber: "1", groupName: "self.group_name" }
                 {
                     'type': 'game_started',
                     'game_group': self.new_match.group_name,
                     'player': player2,
-                    'paddle': self.paddleLeft.to_dict()
+                    'paddleRight': self.paddleRight.to_dict(),
+                    'paddleLeft': self.paddleLeft.to_dict(),
                 })
-                    # 'canvasHeight': self.canvasHeight,
-                    # 'canvasWidth': self.canvasWidth,
-                    # 'paddlesW': self.paddlesW, 
-                    # 'paddlesH': self.paddlesH,
-                    # 'paddlesXleft': self.canvasWidth * 0.98,
-                    # 'paddlesXright': self.canvasWidth * 0.01,
-                    # 'paddlesY': self.paddlesY,
-                    # 'paddlesB': self.paddlesB,
             
-                    # 'ballX': self.canvasHeight / 2,
-                    # 'ballY': self.canvasWidth / 2,
-                    # 'radius': self.canvasWidth *.02,
-                    # 'speedX': 5,
-                    # 'speedY': 0 ,
-                    # 'constSpeed': 5,
-                    # 'angle': 0
+            
         
         
     async def receive(self, text_data):
@@ -203,38 +191,32 @@ class GameClient(AsyncWebsocketConsumer):
         if data['type'] == 'paddleMove':
             if data['playerNumber'] == '1':
                 if data['direction'] == 'up':
-                    GameClient.paddlesY = data['paddley']
-                    GameClient.paddlesYL = data['paddley']
-                    GameClient.paddlesXL = data['paddlex']
-                else:
-                    GameClient.paddlesY = data['paddley']
-                    GameClient.paddlesYL = data['paddley']
-                    GameClient.paddlesXL = data['paddlex']
+                    self.paddleRight.paddleY += 10
+                else: 
+                    self.paddleRight.paddleY -= 10  
                 group_name = data['gameGroup']
                 await self.channel_layer.group_send(
                     group_name,
                     {
                         'type': 'paddleMoved',
                         'playerNumber': data['playerNumber'],
-                        'updateY': GameClient.paddlesY
+                        'updateY': self.paddleRight.to_dict()
                     }
                 )
             elif data['playerNumber'] == '2':
                 if data['direction'] == 'up':
-                    GameClient.paddlesY = data['paddley']
-                    GameClient.paddlesYR = data['paddley']
-                    GameClient.paddlesXR = data['paddlex']
+                    self.paddleLeft.paddleY += 10
+                    # max(0, self.paddleLeft.paddleY - self.paddleLeft.paddleSpeed) 
                 else:
-                    GameClient.paddlesY = data['paddley']
-                    GameClient.paddlesYR = data['paddley']
-                    GameClient.paddlesXR = data['paddlex']
+                    self.paddleLeft.paddleY -= 10
+                    # min(self.paddleLeft.paddleHeight - self.paddleLeft.paddleHeight, self.paddleLeft.paddleY + self.paddleLeft.paddleSpeed)   
                 group_name = data['gameGroup']
                 await self.channel_layer.group_send(
                     group_name,
                     {
                         'type': 'paddleMoved',
                         'playerNumber': data['playerNumber'],
-                        'updateY': GameClient.paddlesY
+                        'updateY': self.paddleLeft.to_dict()
                     }
                 )
                 
@@ -244,7 +226,8 @@ class GameClient(AsyncWebsocketConsumer):
             'type': event['type'],
             'game_group': event['game_group'],
             'player': event['player'],
-            'paddle': event['paddle']
+            'paddleRight': event['paddleRight'],
+            'paddleLeft': event['paddleLeft'],
         }))
         
         
@@ -259,12 +242,12 @@ class GameClient(AsyncWebsocketConsumer):
         
     
         
-    # async def paddleMoved(self, event):
-    #     await self.send(json.dumps({
-    #         'type': event['type'],
-    #         'playerNumber': event['playerNumber'],
-    #         'updateY': event['updateY']
-    #     }))
+    async def paddleMoved(self, event):
+        await self.send(json.dumps({
+            'type': event['type'],
+            'playerNumber': event['playerNumber'],
+            'updateY': event['updateY']
+        }))
     
     
 
