@@ -6,7 +6,7 @@
 /*   By: yamajid <yamajid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 12:41:28 by momihamm          #+#    #+#             */
-/*   Updated: 2024/12/13 17:10:43 by yamajid          ###   ########.fr       */
+/*   Updated: 2024/12/14 20:33:21 by yamajid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ let speedX = 0
 let speedY =  0
 let constSpeed = 0
 let angle = 0
+let score = 0
 
 function App() {
   const [gameUrl] = useState('ws://127.0.0.1:8000/ws/ping_pong');
@@ -51,39 +52,49 @@ function App() {
             const data = JSON.parse(lastMessage.data);
             // console.log(data)
             if (data['type'] === 'connection'){
-                setPlayerNmber(data['information']['player_number'])
-                setPlayerName(data['information']['player_name'])
+              setPlayerNmber(data['information']['player_number'])
+              setPlayerName(data['information']['player_name'])
             }
             if (data['type'] === 'game_started')
               {
-                // console.log(data['matchNum'])
-                canvasH = data['canvasHeight']
-                canvasW = data['canvasWidth']
-                paddleWidth = data['paddlesW']    
-                paddleHeight = data['paddlesH']    
-                xL = data['paddlesXleft']    
-                xR = data['paddlesXright']    
-                yL = data['paddlesY']       
-                yR = data['paddlesY']       
-                bord = data['paddlesB']
-                ballX = data['ballX']
-                ballY = data['ballY']
-                radius = data['radius']
-                speedX = data['speedX']
-                speedY = data['speedY']
-                constSpeed = data['constSpeed']
-                angle = data['angle']
-                setGame(data['game_group'])
+                // console.log(data.player)
+                canvasH = data.paddle.canvasHeight
+                canvasW = data.paddle.canvasWidth
+                paddleWidth = data.paddle.width  
+                paddleHeight = data.paddle.height
+                if (data.player.player_number === '1'){
+                    xL = data.paddle.x
+                    yL = data.paddle. y    
+                  }
+                  else{
+                    xR = data.paddle.x   
+                    yR = data.paddle.y      
+                }
+                // bord = data.paddle.
+                bord = data.paddle.border
+                score = data.paddle.score
+                setGame(data.game_group)
+                // // ball
+                // ballX = data['ballX']
+                // ballY = data['ballY']
+                // radius = data['radius']
+                // speedX = data['speedX']
+                // speedY = data['speedY']
+                // constSpeed = data['constSpeed']
+                // angle = data['angle']
                 
               }
               // console.log(data)
-            if (data['type'] === "paddleMoved"){
-                // console.log(data);
-                if (data['playerNumber'] === '1')
-                    yL = data.updateY;
-                else
-                    yR = data.updateY;
-            }
+            // if (data['type'] === "paddleMoved"){
+            //     // console.log(data);
+            //     if (data['playerNumber'] === '1')
+            //         yL = data.updateY;
+            //     else
+            //         yR = data.updateY;
+            // }
+            // if (data['type'] === "ball_update"){
+            //   console.log(data);
+            // }
             }
               
           }
@@ -122,7 +133,7 @@ function App() {
     const handlePaddleMovement = (p5) => {
       // console.log("whach dkhel be3da");
       // Move left paddle with W (up) and S (down)
-      if (p5.keyIsDown(87) ) { // 'W' key
+      if (p5.keyIsDown(87) || p5.keyIsDown(p5.UP_ARROW)) { // 'W' key
         // console.log(playerNumber)
         // console.log(playerName)
         // console.log(gameG)
@@ -138,7 +149,7 @@ function App() {
           'gameGroup': gameG
         }))
       }
-      if (p5.keyIsDown(83)) { // 'S' key
+      if (p5.keyIsDown(83) || p5.keyIsDown(p5.DOWN_ARROW)) { // 'S' key
         leftPaddle.y = Math.min(p5.height - leftPaddle.height, leftPaddle.y + leftPaddle.speed);
         sendMessage(JSON.stringify({
           'type' : 'paddleMove',
@@ -152,30 +163,30 @@ function App() {
       }
       
       // Move right paddle with UP and DOWN arrow keys
-      if (p5.keyIsDown(p5.UP_ARROW)) {
-        rightPaddle.y = Math.max(0, rightPaddle.y - rightPaddle.speed);
-        sendMessage(JSON.stringify({
-          'type' : 'paddleMove',
-          'direction': 'up',
-          'playerNumber': playerNumber,
-          'playerName': playerName,
-          'paddley': rightPaddle.y,
-          'paddlex': rightPaddle.x,
-          'gameGroup': gameG
-        }))// Prevent moving out of bounds
-      }
-      if (p5.keyIsDown(p5.DOWN_ARROW)) {
-        rightPaddle.y = Math.min(p5.height - rightPaddle.height, rightPaddle.y + rightPaddle.speed);
-        sendMessage(JSON.stringify({
-          'type' : 'paddleMove',
-          'direction': 'down',
-          'playerNumber': playerNumber,
-          'playerName': playerName,
-          'paddley': rightPaddle.y,
-          'paddlex': rightPaddle.x,
-          'gameGroup': gameG
-        }))
-      }
+      // if (p5.keyIsDown(87) || p5.keyIsDown(p5.UP_ARROW)) {
+      //   rightPaddle.y = Math.max(0, rightPaddle.y - rightPaddle.speed);
+      //   sendMessage(JSON.stringify({
+      //     'type' : 'paddleMove',
+      //     'direction': 'up',
+      //     'playerNumber': playerNumber,
+      //     'playerName': playerName,
+      //     'paddley': rightPaddle.y,
+      //     'paddlex': rightPaddle.x,
+      //     'gameGroup': gameG
+      //   }))// Prevent moving out of bounds
+      // }
+      // if (p5.keyIsDown(83) || p5.keyIsDown(p5.DOWN_ARROW)) {
+      //   rightPaddle.y = Math.min(p5.height - rightPaddle.height, rightPaddle.y + rightPaddle.speed);
+      //   sendMessage(JSON.stringify({
+      //     'type' : 'paddleMove',
+      //     'direction': 'down',
+      //     'playerNumber': playerNumber,
+      //     'playerName': playerName,
+      //     'paddley': rightPaddle.y,
+      //     'paddlex': rightPaddle.x,
+      //     'gameGroup': gameG
+      //   }))
+      // }
     };
     
     const draw = (p5) => {
@@ -195,17 +206,17 @@ function App() {
       p5.textSize(p5.width * 0.1); // Text size relative to canvas width
       p5.textAlign(p5.CENTER, p5.CENTER); // Center align text
       handlePaddleMovement(p5);
-      leftPaddle.show(p5,p5.width * 0.97, yL, paddleWidth, paddleHeight, bord);
-      rightPaddle.show(p5,p5.width * 0.01, yR, paddleWidth, paddleHeight, bord);
+      leftPaddle.show(p5, xL, yL, paddleWidth, paddleHeight, bord);
+      rightPaddle.show(p5, xR, yR, paddleWidth, paddleHeight, bord);
       
-      ball.move(p5, leftPaddle, rightPaddle);
+      // ball.move(p5, leftPaddle, rightPaddle);
       // console.log(ball)
-      p5.text(leftPaddle.score, p5.width * 0.25, p5.height * 0.2); // Left score at 25% width
-          p5.text(rightPaddle.score, p5.width * 0.75, p5.height * 0.2); // Right score at 75% width
+      p5.text(leftPaddle.score, canvasW * 0.25, canvasH * 0.2); // Left score at 25% width
+          p5.text(rightPaddle.score, canvasW * 0.75, canvasH * 0.2); // Right score at 75% width
           ball.show(p5);
-        };
+      };
         
-        const windowResized = (p5) => {
+      const windowResized = (p5) => {
           // Adjust the canvas size dynamically on window resize
       const canvasWidth = canvasW; // 80% of window width
       const canvasHeight = canvasH; // 60% of window height
@@ -218,7 +229,7 @@ function App() {
       ball.x = canvasWidth * 0.5;
       ball.y = canvasHeight * 0.5;
       
-      p5.resizeCanvas(canvasWidth, canvasHeight);
+      // p5.resizeCanvas(canvasWidth, canvasHeight);
       // return () => {
       //   if (close) {
       //     close();
