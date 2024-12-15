@@ -6,7 +6,7 @@
 /*   By: yamajid <yamajid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 12:41:28 by momihamm          #+#    #+#             */
-/*   Updated: 2024/12/15 15:34:58 by yamajid          ###   ########.fr       */
+/*   Updated: 2024/12/15 15:43:25 by yamajid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,9 @@ function App() {
               
           }
         }, [lastMessage])
+  const show = (p5, x, y, width, height, bord) => {
+    p5.rect(x, y, width, height, bord);
+  }
   const Canvas = () => {
     
     // let paddleWidth = width;//= p5.width * 0.02; // 2% of canvas width
@@ -111,9 +114,9 @@ function App() {
       canvas.style('left', '10%');         // Move 10% to the right
       canvas.style('border-radius', '15px');
       canvas.style('border', '2px dashed white');
-      leftPaddle = new Paddle(leftPaddle.x , leftPaddle.y, leftPaddle.width, leftPaddle.height, leftPaddle.speed,10, leftPaddle.score);
-      // console.log(yR)
-      rightPaddle = new Paddle(rightPaddle.x , rightPaddle.y, rightPaddle.width, rightPaddle.height, rightPaddle.speed, 10, rightPaddle.score);
+      // leftPaddle = new Paddle(leftPaddle.x , leftPaddle.y, leftPaddle.width, leftPaddle.height, leftPaddle.speed,10, leftPaddle.score);
+      // // console.log(yR)
+      // rightPaddle = new Paddle(rightPaddle.x , rightPaddle.y, rightPaddle.width, rightPaddle.height, rightPaddle.speed, 10, rightPaddle.score);
       ball = new Ball(ballX, ballY, radius, speedX, speedY, angle, canvasWidth, speedY);
       p5.frameRate(60);
     };
@@ -165,8 +168,8 @@ function App() {
       p5.textSize(canvasW * 0.1); // Text size relative to canvas width
       p5.textAlign(p5.CENTER, p5.CENTER); // Center align text
       handlePaddleMovement(p5);
-      leftPaddle.show(p5, leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height, 10);
-      rightPaddle.show(p5, rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height,  10);
+      show(p5, leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height, 10);
+      show(p5, rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height,  10);
       
       // ball.move(p5, leftPaddle, rightPaddle);
       // console.log(ball)
