@@ -2,20 +2,6 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 import asyncio
 
-
-# class Ball:
-#     def __init__(self,x, y, radius, speedX, speedY, angle, canvasW, canvasH, constSpeed):
-#         self.x = x; # Ball's x position
-#         self.y = y; # Ball's y position
-#         self.radius = radius; # Ball's radius
-#         self.speedX = speedX; # Horizontal speed
-#         self.speedY = speedY; # Vertical speed
-#         self.angle = angle;
-#         self.canvas_width = canvasW;
-#         self.canvas_height = canvasH;
-#         self.constSpeed = constSpeed;
-#         # this.genSpeed = genSpeed;
-        
     # def move(self, rightX, leftX, rightY, leftY, paddleWidth, paddleHeight):
     #     # Update ball position
     #     self.x += self.speedX
@@ -54,6 +40,32 @@ import asyncio
     #     self.y = self.canvas_height / 2
     #     self.speedX *= -1  # Reverse direction
     #     self.speedY = 0
+
+class Ball:
+    def __init__(self,x, y, radius, speedX, speedY, angle, canvasW, canvasH, constSpeed):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.speedX = speedX
+        self.speedY = speedY
+        self.angle = angle
+        self.canvas_width = canvasW
+        self.canvas_height = canvasH
+        self.constSpeed = constSpeed
+    def to_dict(self):
+        return {
+            'x': self.x,
+            'y': self.y,
+            'radius' :self.radius,
+            'speedX': self.speedX,
+            'speedY': self.speedY,
+            'angle': self.angle,
+            'canvas_width': self.canvas_width,
+            'canvas_height': self.canvas_height,
+            'constSpeed': self.constSpeed
+        }
+        # this.genSpeed = genSpeed;
+        
   
           
 
@@ -82,7 +94,7 @@ class Paddle:
         self.canvasHeight = canvasHeight
         self.canvasWidth = canvasWidth
     def to_dict(self):
-            return {
+        return {
             'width': self.paddleWidth,
             'height': self.paddleHeight,
             'x': self.paddleX,
@@ -101,37 +113,36 @@ class GameClient(AsyncWebsocketConsumer):
     active_matches = []
     canvasHeight = 400
     canvasWidth = 600
-    paddlesW = 10
-    paddlesH = 100
-    # paddlesX = 5
-    # paddlesY = 100
-    paddlesYL = 100
-    paddlesXL = canvasWidth * 0.01
-    paddlesYR = 100
-    paddlesXR = canvasWidth * 0.98
-    paddlesB = 10
-    paddlesSpeed = 10
-    paddlesScore = 10
+    ball = Ball(
+        x=canvasWidth // 2,
+        y=canvasHeight // 2,
+        radius=10,
+        speedX=5,
+        speedY=5,
+        angle=0,
+        canvasW=canvasWidth,
+        canvasH=canvasHeight,
+        constSpeed=5
+    )
     paddleRight = Paddle(
-        paddleWidth=paddlesW,
-        paddleHeight=paddlesH,
-        paddleY=paddlesYR,
-        paddleX=paddlesXR,
-        paddleSpeed=paddlesSpeed,
-        paddleBord=paddlesB,
-        paddleScore=paddlesScore,
+        paddleWidth=10,
+        paddleHeight=100,
+        paddleX=canvasWidth * 0.98,
+        paddleY=100,
+        paddleSpeed=10,
+        paddleBord=10,
+        paddleScore=0,
         canvasHeight=canvasHeight,
         canvasWidth=canvasWidth
     )
-    
     paddleLeft = Paddle(
-        paddleWidth=paddlesW,
-        paddleHeight=paddlesH,
-        paddleY=paddlesYL,
-        paddleX=paddlesXL,
-        paddleSpeed=paddlesSpeed,
-        paddleBord=paddlesB,
-        paddleScore=paddlesScore,
+        paddleWidth=10,
+        paddleHeight=100,
+        paddleX=canvasWidth * 0.01,
+        paddleY=100,
+        paddleSpeed=10,
+        paddleBord=10,
+        paddleScore=0,
         canvasHeight=canvasHeight,
         canvasWidth=canvasWidth
     )
@@ -161,22 +172,24 @@ class GameClient(AsyncWebsocketConsumer):
             await self.channel_layer.group_add(self.new_match.group_name, player1['player_name'])
             await self.channel_layer.group_add(self.new_match.group_name, player2['player_name'])
             self.active_matches.append(self.new_match)
-            print(self.new_match.group_name)
-            await self.channel_layer.send(player1['player_name'], # data{ type:"move", playerNumber: "1", groupName: "self.group_name" }
+            print(self.ball.to_dict())
+            await self.channel_layer.send(player1['player_name'], 
                 {
                     'type': 'game_started',
                     'game_group': self.new_match.group_name,
                     'player': player1,
                     'paddleRight': self.paddleRight.to_dict(),
-                    'paddleLeft': self.paddleLeft.to_dict()
+                    'paddleLeft': self.paddleLeft.to_dict(),
+                    'ball': self.ball.to_dict()
                 })
-            await self.channel_layer.send(player2['player_name'], # data{ type:"move", playerNumber: "1", groupName: "self.group_name" }
+            await self.channel_layer.send(player2['player_name'],
                 {
                     'type': 'game_started',
                     'game_group': self.new_match.group_name,
                     'player': player2,
                     'paddleRight': self.paddleRight.to_dict(),
                     'paddleLeft': self.paddleLeft.to_dict(),
+                    'ball': self.ball.to_dict()
                 })
             
             
@@ -189,36 +202,28 @@ class GameClient(AsyncWebsocketConsumer):
         except Exception as e:
             print("error :", e)
         if data['type'] == 'paddleMove':
-            if data['playerNumber'] == '1':
-                if data['direction'] == 'up':
-                    self.paddleRight.paddleY += 10
-                else: 
-                    self.paddleRight.paddleY -= 10  
+            if data['type'] == 'paddleMove':
+                if data['playerNumber'] == '1':
+                    self._move_paddle(self.paddleRight, data['direction'])
+                elif data['playerNumber'] == '2':
+                    self._move_paddle(self.paddleLeft, data['direction'])
+
                 group_name = data['gameGroup']
                 await self.channel_layer.group_send(
                     group_name,
                     {
                         'type': 'paddleMoved',
                         'playerNumber': data['playerNumber'],
-                        'updateY': self.paddleRight.to_dict()
+                        'updateY': self.paddleRight.to_dict() if data['playerNumber'] == '1' else self.paddleLeft.to_dict()
                     }
                 )
-            elif data['playerNumber'] == '2':
-                if data['direction'] == 'up':
-                    self.paddleLeft.paddleY += 10
-                    # max(0, self.paddleLeft.paddleY - self.paddleLeft.paddleSpeed) 
-                else:
-                    self.paddleLeft.paddleY -= 10
-                    # min(self.paddleLeft.paddleHeight - self.paddleLeft.paddleHeight, self.paddleLeft.paddleY + self.paddleLeft.paddleSpeed)   
-                group_name = data['gameGroup']
-                await self.channel_layer.group_send(
-                    group_name,
-                    {
-                        'type': 'paddleMoved',
-                        'playerNumber': data['playerNumber'],
-                        'updateY': self.paddleLeft.to_dict()
-                    }
-                )
+                
+                
+    def _move_paddle(self, paddle, direction):
+        if direction == 'up' and paddle.paddleY > 0:
+            paddle.paddleY -= 10
+        elif direction == 'down' and paddle.paddleY < (paddle.canvasHeight - paddle.paddleHeight):
+            paddle.paddleY += 10
                 
     
     async def game_started(self, event):
@@ -228,6 +233,7 @@ class GameClient(AsyncWebsocketConsumer):
             'player': event['player'],
             'paddleRight': event['paddleRight'],
             'paddleLeft': event['paddleLeft'],
+            'ball': event['ball']
         }))
         
         

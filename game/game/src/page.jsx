@@ -6,7 +6,7 @@
 /*   By: yamajid <yamajid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 12:41:28 by momihamm          #+#    #+#             */
-/*   Updated: 2024/12/15 00:22:57 by yamajid          ###   ########.fr       */
+/*   Updated: 2024/12/15 15:34:58 by yamajid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ let angle = 0
 let score = 0
 let leftPaddle = '' 
 let rightPaddle = ''
+let ball = ''
 
 function App() {
   const [gameUrl] = useState('ws://127.0.0.1:8000/ws/ping_pong');
@@ -60,18 +61,19 @@ function App() {
             }
             if (data['type'] === 'game_started')
               {
-                canvasH = data.paddleLeft.canvasHeight
-                canvasW = data.paddleRight.canvasWidth
-                if (data.player.player_number === '1'){
-                    rightPaddle = data.paddleRight;
-                    leftPaddle = data.paddleLeft;
+                  canvasH = data.paddleLeft.canvasHeight
+                  canvasW = data.paddleRight.canvasWidth
+                  if (data.player.player_number === '1'){
+                      rightPaddle = data.paddleRight;
+                      leftPaddle = data.paddleLeft;
+                      ball = data.ball;
+                    }
+                    else{
+                      leftPaddle = data.paddleLeft;
+                      rightPaddle = data.paddleRight;
+                      ball = data.ball;   
                   }
-                  else{
-                    leftPaddle = data.paddleLeft;
-                    rightPaddle = data.paddleRight;    
-                }
-                // console.log(rightPaddle)
-                setGame(data.game_group)
+                  setGame(data.game_group)
                 
               }
             if (data['type'] === "paddleMoved"){
@@ -91,7 +93,7 @@ function App() {
           }
         }, [lastMessage])
   const Canvas = () => {
-    let ball;
+    
     // let paddleWidth = width;//= p5.width * 0.02; // 2% of canvas width
     // let paddleHeight = height;// = p5.height * 0.2; // 20% of canvas height
     // let ballRadius = 0;// p5.width * 0.02; // 2% of canvas width
@@ -130,8 +132,6 @@ function App() {
           'direction': 'up',
           'playerNumber': playerNumber,
           'playerName': playerName,
-          // 'paddley': leftPaddle.y,
-          // 'paddlex': leftPaddle.x,
           'gameGroup': gameG
         }))
       }
@@ -165,8 +165,8 @@ function App() {
       p5.textSize(canvasW * 0.1); // Text size relative to canvas width
       p5.textAlign(p5.CENTER, p5.CENTER); // Center align text
       handlePaddleMovement(p5);
-      leftPaddle.show(p5, leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height, leftPaddle.bord);
-      rightPaddle.show(p5, rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height, rightPaddle.bord);
+      leftPaddle.show(p5, leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height, 10);
+      rightPaddle.show(p5, rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height,  10);
       
       // ball.move(p5, leftPaddle, rightPaddle);
       // console.log(ball)
