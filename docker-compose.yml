@@ -1,0 +1,102 @@
+volumes:
+    elastic:
+        driver: local
+    postgres_data:
+        driver: local
+    logs:
+        driver: local
+
+services:
+
+    frontend:
+        container_name: frontend
+        build:
+          context: ./Deployment/React/
+        restart: unless-stopped
+        volumes:
+          - ./Frontend:/app
+        ports:
+          - "3000:3000"
+        depends_on:
+          - backend
+        env_file:
+          - .env
+
+    backend:
+        container_name: backend
+        build:
+          context: ./Deployment/Django/
+        restart: unless-stopped
+        volumes:
+          - ./Backend:/app
+        depends_on:
+          - redis
+          - postgresql
+        ports:
+          - 8000:8000
+        env_file:
+          - .env
+
+    postgresql:
+        container_name: postgresql
+        image: postgres:latest
+        restart: unless-stopped
+        env_file:
+          - .env
+        volumes:
+           - postgres_data:/var/lib/postgresql/data
+    redis:
+        container_name: redis
+        build: ./Deployment/redis/
+        restart: unless-stopped
+
+    nginx:
+        container_name: nginx
+        build:
+          context: ./Deployment/nginx/
+        restart: unless-stopped
+        volumes:
+          - logs:/var/log/nginx/
+        env_file:
+          - .env
+        depends_on:
+          - frontend
+          - backend
+        ports:
+          - "4433:443"
+  
+    logstash:
+        container_name: logstash
+        image: docker.elastic.co/logstash/logstash:8.17.0
+        restart: unless-stopped
+        volumes:
+          - ./Deployment/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+          - logs:/var/log/nginx/
+        group_add:
+          - adm 
+        depends_on:
+          - elasticsearch
+          - nginx
+
+    elasticsearch:
+        container_name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+        volumes:
+          - elastic:/usr/share/elasticsearch/data
+          - ./Deployment/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+        restart: unless-stopped
+
+    kibana:
+        image: docker.elastic.co/kibana/kibana:8.17.0
+        container_name: kibana
+        env_file:
+          - .env
+        volumes:
+          - ./Deployment/export.ndjson:/dashboard.ndjson
+          - ./Deployment/kibana.sh:/kibana.sh
+        ports:
+          - "5601:5601"
+        depends_on:
+          - elasticsearch
+        restart: unless-stopped
+        entrypoint: ["/bin/bash", "/kibana.sh"]
