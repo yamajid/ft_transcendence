@@ -5,7 +5,8 @@ A real-time multiplayer Ping Pong game built using **Django**, **React.js**, and
 ---
 
 ## Table of Contents
-- [Project Structure](ft_transcendence/
+
+- ft_transcendence/
 ├── backend/                  # Django backend
 │   ├── manage.py
 │   ├── requirements.txt
@@ -25,7 +26,6 @@ A real-time multiplayer Ping Pong game built using **Django**, **React.js**, and
 ├── Dockerfile                # Dockerfile for backend
 ├── .env                      # Environment variables
 └── README.md)
-- [Contributing](github.com/lmakina,github.com/kvras)
 
 ---
 
