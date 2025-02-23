@@ -1,4 +1,4 @@
-# Ping Pong Web Game
+# Ping Pong Web Game(group project)
 
 A real-time multiplayer Ping Pong game built using **Django**, **React.js**, and **WebSockets**. This project features user authentication via **OAuth**, live chat functionality, and a responsive user interface.
 
