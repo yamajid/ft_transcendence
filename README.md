@@ -2,30 +2,6 @@
 
 A real-time multiplayer Ping Pong game built using **Django**, **React.js**, and **WebSockets**. This project features user authentication via **OAuth**, live chat functionality, and a responsive user interface.
 
----
-
-## Table of Contents
-
-- ft_transcendence/
-├── backend/                  # Django backend
-│   ├── manage.py
-│   ├── requirements.txt
-│   └── transcendence/        # Django app
-│       ├── settings.py
-│       ├── urls.py
-│       ├── views.py
-│       └── consumers.py      # WebSocket handlers
-├── frontend/                 # React frontend
-│   ├── public/
-│   ├── src/
-│   │   ├── components/       # React components
-│   │   ├── App.js
-│   │   └── index.js
-│   └── package.json
-├── docker-compose.yml        # Docker Compose configuration
-├── Dockerfile                # Dockerfile for backend
-├── .env                      # Environment variables
-└── README.md)
 
 ---
 
