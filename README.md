@@ -88,7 +88,7 @@ pip install -r requirements.txt
 
 
 ## 👥 Contributors
-- @yamajid (Project Lead)
+- @yamajid
 - @lmakina
 - @kvras
 
