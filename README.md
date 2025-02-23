@@ -7,7 +7,7 @@ A real-time multiplayer Ping Pong game built using **Django**, **React.js**, and
 
 ## Features
 - **Real-Time Multiplayer Gameplay**: Play Ping Pong with other users in real-time using WebSockets.
-- **User Authentication**: Secure login and registration using **OAuth** (e.g., Google, GitHub) and traditional authentication.
+- **User Authentication**: Secure login and registration using **OAuth** (Intra 42) and traditional authentication.
 - **Live Chat**: Communicate with other players using the built-in live chat feature.
 - **User Profiles**: Manage user profiles, including profile creation, updates, and deletion.
 - **Responsive Design**: A modern and responsive user interface built with **React.js**.
