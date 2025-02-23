@@ -89,7 +89,7 @@ pip install -r requirements.txt
 
 ## 👥 Contributors
 - @yamajid
-- @lmakina
+- @lmakinaa
 - @kvras
 
 
